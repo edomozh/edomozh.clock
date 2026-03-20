@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Edomozh.Clock",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/src/Edomozh.Clock/bin/Debug/net8.0-windows/Edomozh.Clock.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/Edomozh.Clock",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        }
+    ]
+}

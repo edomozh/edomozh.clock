@@ -33,19 +33,18 @@ A configurable transparent digital clock overlay for Windows.
 ## Build
 
 ```bash
-cd edomozh.clock
 dotnet build
 ```
 
 ## Publish (Single EXE)
 
 ```bash
-dotnet publish edomozh.clock -c Release
+dotnet publish
 ```
 
 Output: `edomozh.clock/bin/Release/net8.0-windows/win-x64/publish/edomozh.clock.exe`
 
-This produces a single self-contained executable (~150MB) that includes the .NET runtime.
+This produces a single self-contained executable that includes the .NET runtime.
 
 ## Run
 

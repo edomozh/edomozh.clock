@@ -1,4 +1,4 @@
-# Edomozh.Clock
+# edomozh.clock
 
 A configurable transparent digital clock overlay for Windows.
 
@@ -28,19 +28,29 @@ A configurable transparent digital clock overlay for Windows.
 ## Requirements
 
 - Windows 10/11
-- .NET 8.0 Runtime
+- .NET 8.0 Runtime (not required if using self-contained publish)
 
 ## Build
 
 ```bash
-cd src/Edomozh.Clock
+cd edomozh.clock
 dotnet build
 ```
+
+## Publish (Single EXE)
+
+```bash
+dotnet publish edomozh.clock -c Release
+```
+
+Output: `edomozh.clock/bin/Release/net8.0-windows/win-x64/publish/edomozh.clock.exe`
+
+This produces a single self-contained executable (~150MB) that includes the .NET runtime.
 
 ## Run
 
 ```bash
-dotnet run --project src/Edomozh.Clock
+dotnet run --project edomozh.clock
 ```
 
 Or run the compiled executable from `bin/Debug/net8.0-windows/`.
@@ -56,7 +66,7 @@ Settings are stored in:
 
 1. Run the application - clock overlay appears
 2. Right-click system tray icon for menu:
-   - **Edit Mode** - toggle to drag/reposition clock
+   - **Draggable** - toggle to drag/reposition clock
    - **Settings...** - open settings dialog
    - **Exit** - close application
 3. Double-click tray icon to open settings

@@ -1,36 +1,44 @@
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
+using Edomozh.Clock.Forms;
 using Edomozh.Clock.Models;
 using Edomozh.Clock.Services;
 using Color = System.Windows.Media.Color;
 using ColorConverter = System.Windows.Media.ColorConverter;
 using Brushes = System.Windows.Media.Brushes;
-using MessageBox = System.Windows.MessageBox;
-using Button = System.Windows.Controls.Button;
-using Orientation = System.Windows.Controls.Orientation;
-using HorizontalAlignment = System.Windows.HorizontalAlignment;
 
-namespace Edomozh.Clock;
+namespace Edomozh.Clock.Forms;
 
 /// <summary>
 /// Settings dialog window.
 /// </summary>
-public partial class SettingsWindow : Window
+public partial class SettingsForm : Window
 {
     private readonly SettingsService _settingsService;
     private readonly AutostartService _autostartService;
     private bool _isLoading;
 
-    public SettingsWindow(SettingsService settingsService, AutostartService autostartService)
+    public SettingsForm(SettingsService settingsService, AutostartService autostartService)
     {
         InitializeComponent();
         _settingsService = settingsService;
         _autostartService = autostartService;
 
+        // Wire up placeholder visibility first
+        CustomFormatTextBox.TextChanged += (s, e) => UpdateCustomFormatPlaceholder();
+
         LoadFonts();
         LoadFromSettings();
         LoadPresets();
+        
+        UpdateCustomFormatPlaceholder();
+    }
+
+    private void UpdateCustomFormatPlaceholder()
+    {
+        CustomFormatPlaceholder.Visibility = string.IsNullOrEmpty(CustomFormatTextBox.Text) 
+            ? Visibility.Visible 
+            : Visibility.Collapsed;
     }
 
     private void LoadFonts()
@@ -169,7 +177,7 @@ public partial class SettingsWindow : Window
 
     private void SavePresetButton_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new InputDialog("Save Preset", "Enter preset name:");
+        var dialog = new InputForm("Save Preset", "Enter preset name:");
         if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.InputText))
         {
             var name = dialog.InputText.Trim();
@@ -201,8 +209,8 @@ public partial class SettingsWindow : Window
         var presetName = PresetsComboBox.SelectedItem?.ToString();
         if (string.IsNullOrEmpty(presetName)) return;
 
-        if (MessageBox.Show($"Delete preset '{presetName}'?", "Confirm Delete", 
-            MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+        var dialog = new ConfirmForm("Confirm Delete", $"Delete preset {presetName}?");
+        if (dialog.ShowDialog() == true)
         {
             _settingsService.Settings.Presets.RemoveAll(p => p.Name == presetName);
             _settingsService.Save();
@@ -226,59 +234,5 @@ public partial class SettingsWindow : Window
     {
         DialogResult = false;
         Close();
-    }
-}
-
-/// <summary>
-/// Simple input dialog for preset names.
-/// </summary>
-public class InputDialog : System.Windows.Window
-{
-    private readonly System.Windows.Controls.TextBox _textBox;
-
-    public string InputText => _textBox.Text;
-
-    public InputDialog(string title, string prompt)
-    {
-        Title = title;
-        Width = 400;
-        Height = 180;
-        WindowStartupLocation = WindowStartupLocation.CenterOwner;
-        ResizeMode = ResizeMode.NoResize;
-        ShowInTaskbar = false;
-
-        var grid = new Grid { Margin = new Thickness(16) };
-        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-
-        var label = new TextBlock { Text = prompt, Margin = new Thickness(0, 0, 0, 8) };
-        Grid.SetRow(label, 0);
-        grid.Children.Add(label);
-
-        _textBox = new System.Windows.Controls.TextBox { Height = 28 };
-        Grid.SetRow(_textBox, 1);
-        grid.Children.Add(_textBox);
-
-        var buttonPanel = new StackPanel 
-        { 
-            Orientation = Orientation.Horizontal, 
-            HorizontalAlignment = HorizontalAlignment.Right,
-            Margin = new Thickness(0, 16, 0, 0)
-        };
-        Grid.SetRow(buttonPanel, 2);
-
-        var okButton = new Button { Content = "OK", Width = 70, Margin = new Thickness(0, 0, 8, 0), IsDefault = true };
-        okButton.Click += (s, e) => { DialogResult = true; Close(); };
-        buttonPanel.Children.Add(okButton);
-
-        var cancelButton = new Button { Content = "Cancel", Width = 70, IsCancel = true };
-        cancelButton.Click += (s, e) => { DialogResult = false; Close(); };
-        buttonPanel.Children.Add(cancelButton);
-
-        grid.Children.Add(buttonPanel);
-        Content = grid;
-
-        Loaded += (s, e) => _textBox.Focus();
     }
 }

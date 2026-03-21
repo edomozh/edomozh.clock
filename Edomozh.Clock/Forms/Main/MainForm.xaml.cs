@@ -2,26 +2,25 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Edomozh.Clock.Models;
 using Edomozh.Clock.Native;
 using Edomozh.Clock.Services;
 using Color = System.Windows.Media.Color;
 using FontFamily = System.Windows.Media.FontFamily;
 using ColorConverter = System.Windows.Media.ColorConverter;
 
-namespace Edomozh.Clock;
+namespace Edomozh.Clock.Forms;
 
 /// <summary>
 /// Main clock overlay window.
 /// </summary>
-public partial class MainWindow : Window
+public partial class MainForm : Window
 {
     private readonly DispatcherTimer _timer;
     private readonly SettingsService _settingsService;
     private bool _isEditMode;
     private bool _isDragging;
 
-    public MainWindow(SettingsService settingsService)
+    public MainForm(SettingsService settingsService)
     {
         InitializeComponent();
         _settingsService = settingsService;

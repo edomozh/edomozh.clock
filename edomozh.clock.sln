@@ -2,9 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edomozh.Clock", "src\Edomozh.Clock\Edomozh.Clock.csproj", "{2D992A6E-F51B-84AD-0D60-2F0101BB7C68}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "edomozh.clock", "edomozh.clock\edomozh.clock.csproj", "{28DA5109-77C5-332B-9FD5-E87DEEE3469B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,18 +10,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2D992A6E-F51B-84AD-0D60-2F0101BB7C68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2D992A6E-F51B-84AD-0D60-2F0101BB7C68}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2D992A6E-F51B-84AD-0D60-2F0101BB7C68}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2D992A6E-F51B-84AD-0D60-2F0101BB7C68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28DA5109-77C5-332B-9FD5-E87DEEE3469B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28DA5109-77C5-332B-9FD5-E87DEEE3469B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28DA5109-77C5-332B-9FD5-E87DEEE3469B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28DA5109-77C5-332B-9FD5-E87DEEE3469B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{2D992A6E-F51B-84AD-0D60-2F0101BB7C68} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
-	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {3580E41D-1369-4A4A-9ACA-1D6C9944B07E}
+		SolutionGuid = {F19C30BA-F431-4FBB-9AA4-6DC8793E41F7}
 	EndGlobalSection
 EndGlobal

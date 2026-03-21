@@ -1,35 +1,47 @@
-using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using Edomozh.Clock.Forms;
 using Edomozh.Clock.Services;
 using Hardcodet.Wpf.TaskbarNotification;
 using Application = System.Windows.Application;
-using MessageBox = System.Windows.MessageBox;
 
 namespace Edomozh.Clock;
 
 /// <summary>
+/// Simple ICommand implementation for tray icon commands.
+/// </summary>
+public class RelayCommand : ICommand
+{
+    private readonly Action _execute;
+    public RelayCommand(Action execute) => _execute = execute;
+#pragma warning disable CS0067 // Required by ICommand but unused
+    public event EventHandler? CanExecuteChanged;
+#pragma warning restore CS0067
+    public bool CanExecute(object? parameter) => true;
+    public void Execute(object? parameter) => _execute();
+}
+
+/// <summary>
 /// Application entry point with system tray management.
 /// </summary>
-public partial class App : Application
+public partial class TrayIconForm : Application
 {
     [DllImport("user32.dll")]
     private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-    private const string MutexName = "Edomozh.Clock.SingleInstance";
-    
+    private const string MutexName = "edomozh.clock.SingleInstance";
+
     private Mutex? _mutex;
     private TaskbarIcon? _trayIcon;
-    private MainWindow? _mainWindow;
-    private SettingsWindow? _settingsWindow;
+    private MainForm? _mainWindow;
+    private SettingsForm? _settingsWindow;
     private Icon? _generatedIcon;
-    
+
     private readonly SettingsService _settingsService = new();
     private readonly AutostartService _autostartService = new();
 
-    public static RoutedCommand OpenSettingsCommand { get; } = new();
+    public static ICommand OpenSettingsCommand { get; private set; } = null!;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -37,28 +49,27 @@ public partial class App : Application
         _mutex = new Mutex(true, MutexName, out bool createdNew);
         if (!createdNew)
         {
-            MessageBox.Show("Edomozh Clock is already running.", "Already Running", 
-                MessageBoxButton.OK, MessageBoxImage.Information);
+            new InfoForm("Already Running", "Edomozh Clock is already running.").ShowDialog();
             Shutdown();
             return;
         }
 
         base.OnStartup(e);
 
+        // Initialize command before loading resources
+        OpenSettingsCommand = new RelayCommand(OpenSettings);
+
         // Load settings
         _settingsService.Load();
 
         // Create and show main clock window
-        _mainWindow = new MainWindow(_settingsService);
+        _mainWindow = new MainForm(_settingsService);
         _mainWindow.Show();
 
         // Initialize tray icon with generated icon
         _trayIcon = (TaskbarIcon)FindResource("TrayIcon");
         _generatedIcon = CreateClockIcon();
         _trayIcon.Icon = _generatedIcon;
-        
-        // Wire up double-click command
-        _mainWindow.CommandBindings.Add(new CommandBinding(OpenSettingsCommand, (s, args) => OpenSettings()));
     }
 
     /// <summary>
@@ -69,19 +80,19 @@ public partial class App : Application
         const int size = 32;
         using var bitmap = new Bitmap(size, size);
         using var g = Graphics.FromImage(bitmap);
-        
+
         g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
         g.Clear(Color.Transparent);
-        
+
         // Draw clock circle
         using var pen = new Pen(Color.White, 2);
         g.DrawEllipse(pen, 2, 2, size - 5, size - 5);
-        
+
         // Draw clock hands (pointing to ~10:10)
         int cx = size / 2, cy = size / 2;
         g.DrawLine(pen, cx, cy, cx - 6, cy - 8);  // Hour hand
         g.DrawLine(pen, cx, cy, cx + 6, cy - 10); // Minute hand
-        
+
         return Icon.FromHandle(bitmap.GetHicon());
     }
 
@@ -108,7 +119,7 @@ public partial class App : Application
     private void EditModeMenuItem_Click(object sender, RoutedEventArgs e)
     {
         if (_mainWindow == null) return;
-        
+
         var menuItem = sender as System.Windows.Controls.MenuItem;
         if (menuItem != null)
         {
@@ -130,7 +141,7 @@ public partial class App : Application
             return;
         }
 
-        _settingsWindow = new SettingsWindow(_settingsService, _autostartService);
+        _settingsWindow = new SettingsForm(_settingsService, _autostartService);
         _settingsWindow.ShowDialog();
         _settingsWindow = null;
     }

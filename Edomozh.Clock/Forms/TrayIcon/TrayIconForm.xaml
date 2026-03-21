@@ -1,4 +1,4 @@
-<Application x:Class="Edomozh.Clock.App"
+<Application x:Class="Edomozh.Clock.TrayIconForm"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:tb="http://www.hardcodet.net/taskbar"
@@ -8,12 +8,11 @@
         
         <!-- System Tray Icon -->
         <tb:TaskbarIcon x:Key="TrayIcon"
-                        ToolTipText="Edomozh Clock"
-                        DoubleClickCommand="{x:Static local:App.OpenSettingsCommand}"
+                        DoubleClickCommand="{x:Static local:TrayIconForm.OpenSettingsCommand}"
                         PreviewTrayContextMenuOpen="TrayIcon_PreviewTrayContextMenuOpen">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
-                    <MenuItem x:Name="EditModeMenuItem" Header="Edit Mode" IsCheckable="True"
+                    <MenuItem x:Name="EditModeMenuItem" Header="Draggable" IsCheckable="True"
                               Click="EditModeMenuItem_Click"/>
                     <Separator/>
                     <MenuItem Header="Settings..." Click="SettingsMenuItem_Click"/>

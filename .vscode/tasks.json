@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/Edomozh.Clock/Edomozh.Clock.csproj",
+                "${workspaceFolder}/edomozh.clock/edomozh.clock.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -23,7 +23,7 @@
             "type": "process",
             "args": [
                 "clean",
-                "${workspaceFolder}/src/Edomozh.Clock/Edomozh.Clock.csproj"
+                "${workspaceFolder}/edomozh.clock/edomozh.clock.csproj"
             ],
             "problemMatcher": "$msCompile"
         },
@@ -33,13 +33,9 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/src/Edomozh.Clock/Edomozh.Clock.csproj",
+                "${workspaceFolder}/edomozh.clock/edomozh.clock.csproj",
                 "-c",
-                "Release",
-                "-r",
-                "win-x64",
-                "--self-contained",
-                "false"
+                "Release"
             ],
             "problemMatcher": "$msCompile"
         }

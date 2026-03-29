@@ -3,9 +3,6 @@ using Edomozh.Clock.Helpers;
 
 namespace Edomozh.Clock.Forms;
 
-/// <summary>
-/// Simple input dialog for preset names.
-/// </summary>
 public partial class InputForm : Window
 {
     public string InputText => InputTextBox.Text;
@@ -13,7 +10,7 @@ public partial class InputForm : Window
     public InputForm(string title, string prompt)
     {
         InitializeComponent();
-        
+
         Title = title;
         PromptTextBlock.Text = prompt;
         Icon = IconHelper.CreateClockIconSource();

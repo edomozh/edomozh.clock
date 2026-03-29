@@ -9,9 +9,6 @@ using Brushes = System.Windows.Media.Brushes;
 
 namespace Edomozh.Clock.Forms;
 
-/// <summary>
-/// Settings dialog window.
-/// </summary>
 public partial class SettingsForm : Window
 {
     private readonly SettingsService _settingsService;
@@ -24,7 +21,6 @@ public partial class SettingsForm : Window
         _settingsService = settingsService;
         _autostartService = autostartService;
 
-        // Wire up placeholder visibility first
         CustomFormatTextBox.TextChanged += (s, e) => UpdateCustomFormatPlaceholder();
 
         LoadFonts();
@@ -55,13 +51,11 @@ public partial class SettingsForm : Window
         {
             var settings = _settingsService.Settings;
 
-            // Time format
             Use24HourCheckBox.IsChecked = settings.Use24HourFormat;
             ShowSecondsCheckBox.IsChecked = settings.ShowSeconds;
             ShowDateCheckBox.IsChecked = settings.ShowDate;
             CustomFormatTextBox.Text = settings.CustomTimeFormat ?? "";
 
-            // Appearance
             FontComboBox.SelectedItem = settings.FontFamily;
             FontSizeSlider.Value = settings.FontSize;
             FontSizeLabel.Text = ((int)settings.FontSize).ToString();
@@ -72,7 +66,6 @@ public partial class SettingsForm : Window
             BgOpacitySlider.Value = settings.BackgroundOpacity;
             BgOpacityLabel.Text = $"{(int)(settings.BackgroundOpacity * 100)}%";
 
-            // General
             AlwaysOnTopCheckBox.IsChecked = settings.AlwaysOnTop;
             StartWithWindowsCheckBox.IsChecked = _autostartService.IsEnabled;
         }
@@ -96,26 +89,22 @@ public partial class SettingsForm : Window
     {
         var settings = _settingsService.Settings;
 
-        // Time format
         settings.Use24HourFormat = Use24HourCheckBox.IsChecked ?? true;
         settings.ShowSeconds = ShowSecondsCheckBox.IsChecked ?? true;
         settings.ShowDate = ShowDateCheckBox.IsChecked ?? false;
-        settings.CustomTimeFormat = string.IsNullOrWhiteSpace(CustomFormatTextBox.Text) 
+        settings.CustomTimeFormat = string.IsNullOrWhiteSpace(CustomFormatTextBox.Text)
             ? null 
             : CustomFormatTextBox.Text;
 
-        // Appearance
         settings.FontFamily = FontComboBox.SelectedItem?.ToString() ?? "Segoe UI";
         settings.FontSize = FontSizeSlider.Value;
         settings.TextColor = TextColorTextBox.Text;
         settings.TextOpacity = TextOpacitySlider.Value;
         settings.BackgroundOpacity = BgOpacitySlider.Value;
 
-        // General
         settings.AlwaysOnTop = AlwaysOnTopCheckBox.IsChecked ?? true;
         settings.StartWithWindows = StartWithWindowsCheckBox.IsChecked ?? false;
 
-        // Save and sync autostart
         _settingsService.Save();
         _autostartService.SyncWithSettings(settings.StartWithWindows);
     }
@@ -183,10 +172,8 @@ public partial class SettingsForm : Window
             var name = dialog.InputText.Trim();
             var settings = _settingsService.Settings;
 
-            // Remove existing preset with same name
             settings.Presets.RemoveAll(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
 
-            // Create new preset from current UI values
             var preset = new ThemePreset
             {
                 Name = name,
@@ -223,11 +210,6 @@ public partial class SettingsForm : Window
         SaveToSettings();
         DialogResult = true;
         Close();
-    }
-
-    private void ApplyButton_Click(object sender, RoutedEventArgs e)
-    {
-        SaveToSettings();
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e)

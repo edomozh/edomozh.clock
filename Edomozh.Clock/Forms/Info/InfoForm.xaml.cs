@@ -3,9 +3,6 @@ using Edomozh.Clock.Helpers;
 
 namespace Edomozh.Clock.Forms;
 
-/// <summary>
-/// Simple information dialog with OK button.
-/// </summary>
 public partial class InfoForm : Window
 {
     public InfoForm(string title, string message)

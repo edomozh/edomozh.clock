@@ -4,9 +4,6 @@ using Edomozh.Clock.Models;
 
 namespace Edomozh.Clock.Services;
 
-/// <summary>
-/// Handles loading and saving settings to %APPDATA%\edomozh.clock\settings.config
-/// </summary>
 public class SettingsService
 {
     private static readonly string AppDataFolder = Path.Combine(
@@ -23,19 +20,10 @@ public class SettingsService
 
     private ClockSettings _settings = ClockSettings.CreateDefault();
 
-    /// <summary>
-    /// Current settings instance.
-    /// </summary>
     public ClockSettings Settings => _settings;
 
-    /// <summary>
-    /// Event raised when settings are changed and saved.
-    /// </summary>
     public event EventHandler? SettingsChanged;
 
-    /// <summary>
-    /// Loads settings from disk. Creates default if file doesn't exist.
-    /// </summary>
     public ClockSettings Load()
     {
         try
@@ -49,7 +37,6 @@ public class SettingsService
             else
             {
                 _settings = ClockSettings.CreateDefault();
-                // Add default preset
                 _settings.Presets.Add(ThemePreset.CreateDefault());
                 Save();
             }
@@ -63,14 +50,10 @@ public class SettingsService
         return _settings;
     }
 
-    /// <summary>
-    /// Saves current settings to disk.
-    /// </summary>
     public void Save()
     {
         try
         {
-            // Ensure directory exists
             Directory.CreateDirectory(AppDataFolder);
 
             var json = JsonSerializer.Serialize(_settings, JsonOptions);
@@ -84,18 +67,12 @@ public class SettingsService
         }
     }
 
-    /// <summary>
-    /// Updates settings and saves to disk.
-    /// </summary>
     public void Update(Action<ClockSettings> updateAction)
     {
         updateAction(_settings);
         Save();
     }
 
-    /// <summary>
-    /// Resets settings to defaults and saves.
-    /// </summary>
     public void Reset()
     {
         _settings = ClockSettings.CreateDefault();
@@ -103,13 +80,7 @@ public class SettingsService
         Save();
     }
 
-    /// <summary>
-    /// Gets the settings folder path for display/debugging.
-    /// </summary>
     public static string GetSettingsFolder() => AppDataFolder;
 
-    /// <summary>
-    /// Gets the settings file path for display/debugging.
-    /// </summary>
     public static string GetSettingsFilePath() => SettingsFilePath;
 }

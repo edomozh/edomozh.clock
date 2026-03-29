@@ -10,9 +10,6 @@ using ColorConverter = System.Windows.Media.ColorConverter;
 
 namespace Edomozh.Clock.Forms;
 
-/// <summary>
-/// Main clock overlay window.
-/// </summary>
 public partial class MainForm : Window
 {
     private readonly DispatcherTimer _timer;
@@ -25,20 +22,15 @@ public partial class MainForm : Window
         InitializeComponent();
         _settingsService = settingsService;
 
-        // Set up timer for clock updates
         _timer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(100) // Update frequently for smooth seconds
+            Interval = TimeSpan.FromMilliseconds(100)
         };
         _timer.Tick += Timer_Tick;
 
-        // Subscribe to settings changes
         _settingsService.SettingsChanged += OnSettingsChanged;
     }
 
-    /// <summary>
-    /// Gets or sets whether edit mode is active (clickable/draggable).
-    /// </summary>
     public bool IsEditMode
     {
         get => _isEditMode;
@@ -46,28 +38,22 @@ public partial class MainForm : Window
         {
             _isEditMode = value;
             WindowHelper.SetClickThrough(this, !value);
-            
-            // Visual feedback: slight border when in edit mode
+
             ClockBorder.BorderThickness = value ? new Thickness(2) : new Thickness(0);
             ClockBorder.BorderBrush = value ? new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)) : null;
-            
-            // Change cursor to hand in edit mode
+
             Cursor = value ? System.Windows.Input.Cursors.SizeAll : System.Windows.Input.Cursors.Arrow;
         }
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        // Configure as overlay window
         WindowHelper.SetOverlayMode(this);
-        
-        // Apply settings
+
         ApplySettings();
 
-        // Start in click-through mode
         IsEditMode = false;
 
-        // Start the clock
         UpdateTime();
         _timer.Start();
     }
@@ -100,25 +86,21 @@ public partial class MainForm : Window
     {
         var settings = _settingsService.Settings;
 
-        // Position
         var (x, y) = WindowHelper.ClampToScreen(settings.PositionX, settings.PositionY, ActualWidth, ActualHeight);
         Left = x;
         Top = y;
 
-        // Always on top
         Topmost = settings.AlwaysOnTop;
         if (IsLoaded)
         {
             WindowHelper.SetTopmost(this, settings.AlwaysOnTop);
         }
 
-        // Font
         TimeText.FontFamily = new FontFamily(settings.FontFamily);
         TimeText.FontSize = settings.FontSize;
         DateText.FontFamily = new FontFamily(settings.FontFamily);
         DateText.FontSize = settings.FontSize * 0.35; // Date text is smaller
 
-        // Colors
         try
         {
             var textColor = (Color)ColorConverter.ConvertFromString(settings.TextColor);
@@ -133,7 +115,6 @@ public partial class MainForm : Window
         }
         catch
         {
-            // Invalid color string, use defaults
             TextBrush.Color = Colors.White;
             BackgroundBrush.Color = Colors.Black;
         }
@@ -160,7 +141,6 @@ public partial class MainForm : Window
     {
         if (_isDragging || _isEditMode)
         {
-            // Save position when dragging ends
             _settingsService.Update(s =>
             {
                 s.PositionX = Left;
@@ -169,9 +149,6 @@ public partial class MainForm : Window
         }
     }
 
-    /// <summary>
-    /// Refreshes the display from current settings.
-    /// </summary>
     public void RefreshFromSettings()
     {
         ApplySettings();

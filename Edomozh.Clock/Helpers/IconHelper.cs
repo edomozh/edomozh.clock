@@ -5,9 +5,6 @@ using System.Windows.Media.Imaging;
 
 namespace Edomozh.Clock.Helpers;
 
-/// <summary>
-/// Helper to generate app icon for dialogs.
-/// </summary>
 internal static class IconHelper
 {
     public static ImageSource CreateClockIconSource()

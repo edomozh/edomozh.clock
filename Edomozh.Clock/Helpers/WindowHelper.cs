@@ -4,16 +4,12 @@ using System.Windows.Interop;
 
 namespace Edomozh.Clock.Native;
 
-/// <summary>
-/// P/Invoke helpers for window manipulation: click-through, always-on-top, hide from Alt+Tab.
-/// </summary>
 public static class WindowHelper
 {
     #region Constants
 
     private const int GWL_EXSTYLE = -20;
 
-    // Extended window styles
     private const int WS_EX_TRANSPARENT = 0x00000020;  // Click-through
     private const int WS_EX_LAYERED = 0x00080000;      // Layered window (for transparency)
     private const int WS_EX_TOOLWINDOW = 0x00000080;   // Hide from Alt+Tab
@@ -41,9 +37,6 @@ public static class WindowHelper
 
     #endregion
 
-    /// <summary>
-    /// Makes the window click-through (mouse events pass through to windows below).
-    /// </summary>
     public static void SetClickThrough(Window window, bool enable)
     {
         var hwnd = new WindowInteropHelper(window).Handle;
@@ -63,10 +56,6 @@ public static class WindowHelper
         SetWindowLong(hwnd, GWL_EXSTYLE, exStyle);
     }
 
-    /// <summary>
-    /// Configures window for overlay mode: layered, tool window (hidden from Alt+Tab), no-activate.
-    /// Call this once after window is loaded.
-    /// </summary>
     public static void SetOverlayMode(Window window)
     {
         var hwnd = new WindowInteropHelper(window).Handle;
@@ -77,9 +66,6 @@ public static class WindowHelper
         SetWindowLong(hwnd, GWL_EXSTYLE, exStyle);
     }
 
-    /// <summary>
-    /// Sets window topmost state using Win32 API for more reliable behavior.
-    /// </summary>
     public static void SetTopmost(Window window, bool topmost)
     {
         var hwnd = new WindowInteropHelper(window).Handle;
@@ -92,9 +78,6 @@ public static class WindowHelper
             SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
     }
 
-    /// <summary>
-    /// Checks if position is within virtual screen bounds (all monitors).
-    /// </summary>
     public static bool IsPositionOnScreen(double x, double y)
     {
         return x >= SystemParameters.VirtualScreenLeft &&
@@ -103,9 +86,6 @@ public static class WindowHelper
                y < SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight;
     }
 
-    /// <summary>
-    /// Clamps position to be within virtual screen bounds.
-    /// </summary>
     public static (double X, double Y) ClampToScreen(double x, double y, double width, double height)
     {
         double left = SystemParameters.VirtualScreenLeft;

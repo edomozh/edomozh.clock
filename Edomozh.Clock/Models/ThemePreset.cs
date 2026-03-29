@@ -1,8 +1,5 @@
 namespace Edomozh.Clock.Models;
 
-/// <summary>
-/// Represents a saved appearance theme preset.
-/// </summary>
 public class ThemePreset
 {
     public string Name { get; set; } = "Default";

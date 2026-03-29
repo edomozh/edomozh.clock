@@ -5,22 +5,25 @@
              xmlns:local="clr-namespace:Edomozh.Clock"
              ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
-        
-        <!-- System Tray Icon -->
+
         <tb:TaskbarIcon x:Key="TrayIcon"
                         DoubleClickCommand="{x:Static local:TrayIconForm.OpenSettingsCommand}"
                         PreviewTrayContextMenuOpen="TrayIcon_PreviewTrayContextMenuOpen">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
-                    <MenuItem x:Name="EditModeMenuItem" Header="Draggable" IsCheckable="True"
+                    <MenuItem x:Name="EditModeMenuItem"
+                            Header="Draggable"
+                            IsCheckable="True"
                               Click="EditModeMenuItem_Click"/>
                     <Separator/>
-                    <MenuItem Header="Settings..." Click="SettingsMenuItem_Click"/>
+                    <MenuItem Header="Settings..."
+                            Click="SettingsMenuItem_Click"/>
                     <Separator/>
-                    <MenuItem Header="Exit" Click="ExitMenuItem_Click"/>
+                    <MenuItem Header="Exit"
+                            Click="ExitMenuItem_Click"/>
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>
-        
+
     </Application.Resources>
 </Application>

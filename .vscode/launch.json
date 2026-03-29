@@ -2,12 +2,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Start",
+            "name": "Debug",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/edomozh.clock/bin/Debug/net8.0-windows/win-x64/edomozh.clock.exe",
-            "args": [],
+            "args": [
+                "/property:GenerateFullPaths=true",
+                "/p:Configuration=Debug",
+                "/p:Platform=AnyCPU",
+                "/consoleloggerparameters:NoSummary"
+            ],
             "cwd": "${workspaceFolder}/edomozh.clock",
             "stopAtEntry": false,
             "console": "internalConsole"

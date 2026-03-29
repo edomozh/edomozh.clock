@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Clock Settings"
         Width="450"
-        Height="700"
+        Height="660"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         ShowInTaskbar="True">
@@ -52,8 +52,6 @@
         </Grid.RowDefinitions>
 
         <StackPanel>
-
-            <!-- Time Format -->
             <GroupBox Header="Time Format">
                 <StackPanel>
                     <CheckBox x:Name="Use24HourCheckBox"
@@ -84,7 +82,6 @@
                 </StackPanel>
             </GroupBox>
 
-            <!-- Appearance -->
             <GroupBox Header="Appearance">
                 <StackPanel>
                     <Grid>
@@ -100,7 +97,6 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
 
-                        <!-- Font -->
                         <TextBlock Text="Font:"
                                    Grid.Row="0"
                                    Grid.Column="0"/>
@@ -108,7 +104,6 @@
                                   Grid.Row="0"
                                   Grid.Column="1"/>
 
-                        <!-- Font Size -->
                         <TextBlock Text="Size:"
                                    Grid.Row="1"
                                    Grid.Column="0"/>
@@ -128,7 +123,6 @@
                                        Width="30"/>
                         </StackPanel>
 
-                        <!-- Text Color -->
                         <TextBlock Text="Text color:"
                                    Grid.Row="2"
                                    Grid.Column="0"/>
@@ -146,7 +140,6 @@
                                        StrokeThickness="1"/>
                         </StackPanel>
 
-                        <!-- Text Opacity -->
                         <TextBlock Text="Text opacity:"
                                    Grid.Row="3"
                                    Grid.Column="0"/>
@@ -165,7 +158,6 @@
                                        Width="40"/>
                         </StackPanel>
 
-                        <!-- Background Opacity -->
                         <TextBlock Text="BG opacity:"
                                    Grid.Row="4"
                                    Grid.Column="0"/>
@@ -187,7 +179,6 @@
                 </StackPanel>
             </GroupBox>
 
-            <!-- General -->
             <GroupBox Header="General">
                 <StackPanel>
                     <CheckBox x:Name="AlwaysOnTopCheckBox"
@@ -197,7 +188,6 @@
                 </StackPanel>
             </GroupBox>
 
-            <!-- Presets -->
             <GroupBox Header="Theme Presets">
                 <StackPanel>
                     <Grid>
@@ -214,18 +204,21 @@
                                 Content="Load"
                                 Grid.Column="1"
                                 Width="60"
+                                Height="25"
                                 Margin="0,0,4,0"
                                 Click="LoadPresetButton_Click"/>
                         <Button x:Name="SavePresetButton"
                                 Content="Save"
                                 Grid.Column="2"
                                 Width="60"
+                                Height="25"
                                 Margin="0,0,4,0"
                                 Click="SavePresetButton_Click"/>
                         <Button x:Name="DeletePresetButton"
                                 Content="Delete"
                                 Grid.Column="3"
                                 Width="60"
+                                Height="25"
                                 Click="DeletePresetButton_Click"/>
                     </Grid>
                 </StackPanel>
@@ -233,26 +226,22 @@
 
         </StackPanel>
 
-        <!-- Buttons -->
         <StackPanel Grid.Row="1"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Margin="0,16,0,0">
 
-            <Button x:Name="ApplyButton"
-                    Content="Apply"
-                    Width="80"
-                    Margin="0,0,8,0"
-                    Click="ApplyButton_Click"/>
             <Button x:Name="OkButton"
                     Content="OK"
-                    Width="80"
+                    Width="60"
+                    Height="25"
                     Margin="0,0,8,0"
                     IsDefault="True"
                     Click="OkButton_Click"/>
             <Button x:Name="CancelButton"
                     Content="Cancel"
-                    Width="80"
+                    Width="60"
+                    Height="25"
                     IsCancel="True"
                     Margin="0,0,8,0"
                     Click="CancelButton_Click"/>

@@ -8,9 +8,6 @@ using Application = System.Windows.Application;
 
 namespace Edomozh.Clock;
 
-/// <summary>
-/// Simple ICommand implementation for tray icon commands.
-/// </summary>
 public class RelayCommand : ICommand
 {
     private readonly Action _execute;
@@ -22,9 +19,6 @@ public class RelayCommand : ICommand
     public void Execute(object? parameter) => _execute();
 }
 
-/// <summary>
-/// Application entry point with system tray management.
-/// </summary>
 public partial class TrayIconForm : Application
 {
     [DllImport("user32.dll")]
@@ -45,7 +39,6 @@ public partial class TrayIconForm : Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        // Single instance check
         _mutex = new Mutex(true, MutexName, out bool createdNew);
         if (!createdNew)
         {
@@ -56,25 +49,18 @@ public partial class TrayIconForm : Application
 
         base.OnStartup(e);
 
-        // Initialize command before loading resources
         OpenSettingsCommand = new RelayCommand(OpenSettings);
 
-        // Load settings
         _settingsService.Load();
 
-        // Create and show main clock window
         _mainWindow = new MainForm(_settingsService);
         _mainWindow.Show();
 
-        // Initialize tray icon with generated icon
         _trayIcon = (TaskbarIcon)FindResource("TrayIcon");
         _generatedIcon = CreateClockIcon();
         _trayIcon.Icon = _generatedIcon;
     }
 
-    /// <summary>
-    /// Creates a simple clock icon programmatically.
-    /// </summary>
     private static Icon CreateClockIcon()
     {
         const int size = 32;
@@ -84,11 +70,9 @@ public partial class TrayIconForm : Application
         g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
         g.Clear(Color.Transparent);
 
-        // Draw clock circle
         using var pen = new Pen(Color.White, 2);
         g.DrawEllipse(pen, 2, 2, size - 5, size - 5);
 
-        // Draw clock hands (pointing to ~10:10)
         int cx = size / 2, cy = size / 2;
         g.DrawLine(pen, cx, cy, cx - 6, cy - 8);  // Hour hand
         g.DrawLine(pen, cx, cy, cx + 6, cy - 10); // Minute hand
@@ -98,9 +82,6 @@ public partial class TrayIconForm : Application
 
     private void TrayIcon_PreviewTrayContextMenuOpen(object sender, RoutedEventArgs e)
     {
-        // This fixes the "context menu closes immediately" bug on first click.
-        // Windows requires a foreground window before showing a popup from the notification area.
-        // We create a temporary invisible window to get foreground, then close it.
         var helper = new System.Windows.Window
         {
             Width = 0,
@@ -134,7 +115,6 @@ public partial class TrayIconForm : Application
 
     private void OpenSettings()
     {
-        // Don't open multiple settings windows
         if (_settingsWindow != null && _settingsWindow.IsVisible)
         {
             _settingsWindow.Activate();
@@ -153,19 +133,15 @@ public partial class TrayIconForm : Application
 
     private void ExitApplication()
     {
-        // Save settings
         _settingsService.Save();
 
-        // Dispose tray icon and generated icon
         _trayIcon?.Dispose();
         _trayIcon = null;
         _generatedIcon?.Dispose();
         _generatedIcon = null;
 
-        // Close main window
         _mainWindow?.Close();
 
-        // Release mutex
         _mutex?.ReleaseMutex();
         _mutex?.Dispose();
 

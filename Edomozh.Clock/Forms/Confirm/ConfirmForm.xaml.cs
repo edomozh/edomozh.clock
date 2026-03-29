@@ -3,9 +3,6 @@ using Edomozh.Clock.Helpers;
 
 namespace Edomozh.Clock.Forms;
 
-/// <summary>
-/// Simple confirmation dialog (Yes/No).
-/// </summary>
 public partial class ConfirmForm : Window
 {
     public ConfirmForm(string title, string message)

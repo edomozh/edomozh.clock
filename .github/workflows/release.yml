@@ -4,7 +4,9 @@ on:
   push:
     branches: [master]
     paths:
-      - 'edomozh.clock/**'
+      - '**/*.cs'
+      - '**/*.csproj'
+      - '**/*.xaml'
   workflow_dispatch:
 
 jobs:
@@ -19,7 +21,9 @@ jobs:
       - name: Get version from csproj
         id: get_version
         run: |
-          VERSION=$(grep -oP '<Version>\K[^<]+' edomozh.clock/Edomozh.Clock.csproj)
+          CSPROJ=$(find . -iname "*.csproj" | head -1)
+          echo "Found csproj: $CSPROJ"
+          VERSION=$(grep -oP '<Version>\K[^<]+' "$CSPROJ")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
 
@@ -50,16 +54,18 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Publish
-        run: dotnet publish edomozh.clock/Edomozh.Clock.csproj -c Release
+        run: |
+          $csproj = Get-ChildItem -Recurse -Filter "*.csproj" | Select-Object -First 1
+          dotnet publish $csproj.FullName -c Release
 
       - name: Create Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           $version = "${{ needs.check-version.outputs.version }}"
-          $exePath = "edomozh.clock/bin/Release/net8.0-windows/win-x64/publish/edomozh.clock.exe"
+          $exe = Get-ChildItem -Recurse -Filter "edomozh.clock.exe" | Where-Object { $_.DirectoryName -like "*publish*" } | Select-Object -First 1
           
           gh release create "v$version" `
             --title "Edomozh Clock v$version" `
             --generate-notes `
-            $exePath
+            $exe.FullName

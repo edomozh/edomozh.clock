@@ -9,6 +9,12 @@ on:
       - '**/*.xaml'
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: write
+
 jobs:
   check-version:
     runs-on: ubuntu-latest

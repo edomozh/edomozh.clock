@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'edomozh.clock/**'
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+      should_release: ${{ steps.check_release.outputs.should_release }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version from csproj
+        id: get_version
+        run: |
+          VERSION=$(grep -oP '<Version>\K[^<]+' edomozh.clock/Edomozh.Clock.csproj)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Check if release exists
+        id: check_release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          if gh release view "v$VERSION" > /dev/null 2>&1; then
+            echo "Release v$VERSION already exists"
+            echo "should_release=false" >> $GITHUB_OUTPUT
+          else
+            echo "Release v$VERSION does not exist"
+            echo "should_release=true" >> $GITHUB_OUTPUT
+          fi
+
+  build-and-release:
+    needs: check-version
+    if: needs.check-version.outputs.should_release == 'true'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish
+        run: dotnet publish edomozh.clock/Edomozh.Clock.csproj -c Release
+
+      - name: Create Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = "${{ needs.check-version.outputs.version }}"
+          $exePath = "edomozh.clock/bin/Release/net8.0-windows/win-x64/publish/edomozh.clock.exe"
+          
+          gh release create "v$version" `
+            --title "Edomozh Clock v$version" `
+            --generate-notes `
+            $exePath

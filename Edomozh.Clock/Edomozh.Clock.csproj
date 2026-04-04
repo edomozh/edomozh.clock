@@ -12,6 +12,7 @@
     <Version>1.0.0</Version>
     <Authors>edomozh</Authors>
     <Description>Configurable transparent digital clock overlay for Windows</Description>
+    <ApplicationIcon>Resources\clock.ico</ApplicationIcon>
 
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>

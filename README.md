@@ -2,6 +2,17 @@
 
 A configurable transparent digital clock overlay for Windows.
 
+## Usage
+
+1. Run the application - clock overlay appears
+   - On first launch, Windows may show "Windows protected your PC" (SmartScreen). Click **More info** → **Run anyway**
+2. Right-click system tray icon for menu:
+   - **Draggable** - toggle to drag/reposition clock
+   - **Reset Position** - move clock to top-left corner
+   - **Settings** - open settings dialog
+   - **Exit** - close application
+3. Double-click tray icon to open settings
+
 ## Features
 
 - **Transparent overlay** - clock displays over all applications
@@ -28,49 +39,3 @@ A configurable transparent digital clock overlay for Windows.
 ## Requirements
 
 - Windows 10/11
-- .NET 8.0 Runtime (not required if using self-contained publish)
-
-## Build
-
-```bash
-dotnet build
-```
-
-## Publish (Single EXE)
-
-```bash
-dotnet publish
-```
-
-Output: `edomozh.clock/bin/Release/net8.0-windows/win-x64/publish/edomozh.clock.exe`
-
-This produces a single self-contained executable that includes the .NET runtime.
-
-## Run
-
-```bash
-dotnet run --project edomozh.clock
-```
-
-Or run the compiled executable from `bin/Debug/net8.0-windows/`.
-
-## Configuration
-
-Settings are stored in:
-```
-%APPDATA%\edomozh.clock\settings.config
-```
-
-## Usage
-
-1. Run the application - clock overlay appears
-2. Right-click system tray icon for menu:
-   - **Draggable** - toggle to drag/reposition clock
-   - **Reset Position** - move clock to top-left corner
-   - **Settings** - open settings dialog
-   - **Exit** - close application
-3. Double-click tray icon to open settings
-
-## License
-
-MIT

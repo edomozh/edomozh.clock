@@ -1,5 +1,5 @@
 using System.Windows;
-using Edomozh.Clock.Helpers;
+using Edomozh.Clock.Resources;
 
 namespace Edomozh.Clock.Forms;
 
@@ -11,7 +11,7 @@ public partial class InfoForm : Window
         
         Title = title;
         MessageTextBlock.Text = message;
-        Icon = IconHelper.CreateClockIconSource();
+        Icon = AppResources.ClockIconImageSource;
     }
 
     private void OkButton_Click(object sender, RoutedEventArgs e)

@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Media;
 using Edomozh.Clock.Forms;
 using Edomozh.Clock.Models;
+using Edomozh.Clock.Resources;
 using Edomozh.Clock.Services;
 using Color = System.Windows.Media.Color;
 using ColorConverter = System.Windows.Media.ColorConverter;
@@ -20,14 +21,39 @@ public partial class SettingsForm : Window
         InitializeComponent();
         _settingsService = settingsService;
         _autostartService = autostartService;
+        Icon = AppResources.ClockIconImageSource;
 
-        CustomFormatTextBox.TextChanged += (s, e) => UpdateCustomFormatPlaceholder();
+        _isLoading = true;
 
         LoadFonts();
         LoadFromSettings();
         LoadPresets();
         
         UpdateCustomFormatPlaceholder();
+
+        CustomFormatTextBox.TextChanged += (s, e) => {
+            UpdateCustomFormatPlaceholder();
+            ApplyChanges();
+        };
+        TextColorTextBox.TextChanged += (s, e) => {
+            UpdateColorPreview();
+            ApplyChanges();
+        };
+
+        Use24HourCheckBox.Checked += (s, e) => ApplyChanges();
+        Use24HourCheckBox.Unchecked += (s, e) => ApplyChanges();
+        ShowSecondsCheckBox.Checked += (s, e) => ApplyChanges();
+        ShowSecondsCheckBox.Unchecked += (s, e) => ApplyChanges();
+        ShowDateCheckBox.Checked += (s, e) => ApplyChanges();
+        ShowDateCheckBox.Unchecked += (s, e) => ApplyChanges();
+        AlwaysOnTopCheckBox.Checked += (s, e) => ApplyChanges();
+        AlwaysOnTopCheckBox.Unchecked += (s, e) => ApplyChanges();
+        StartWithWindowsCheckBox.Checked += (s, e) => ApplyChanges();
+        StartWithWindowsCheckBox.Unchecked += (s, e) => ApplyChanges();
+
+        FontComboBox.SelectionChanged += (s, e) => ApplyChanges();
+
+        _isLoading = false;
     }
 
     private void UpdateCustomFormatPlaceholder()
@@ -41,11 +67,11 @@ public partial class SettingsForm : Window
     {
         var fonts = Fonts.SystemFontFamilies.OrderBy(f => f.Source).ToList();
         FontComboBox.ItemsSource = fonts.Select(f => f.Source);
-        FontComboBox.SelectedItem = "Segoe UI";
     }
 
     private void LoadFromSettings()
     {
+        var wasLoading = _isLoading;
         _isLoading = true;
         try
         {
@@ -71,7 +97,7 @@ public partial class SettingsForm : Window
         }
         finally
         {
-            _isLoading = false;
+            _isLoading = wasLoading;
         }
     }
 
@@ -122,22 +148,31 @@ public partial class SettingsForm : Window
         }
     }
 
+    private void ApplyChanges()
+    {
+        if (_isLoading) return;
+        SaveToSettings();
+    }
+
     private void FontSizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
         if (_isLoading || FontSizeLabel == null) return;
         FontSizeLabel.Text = ((int)e.NewValue).ToString();
+        ApplyChanges();
     }
 
     private void TextOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
         if (_isLoading || TextOpacityLabel == null) return;
         TextOpacityLabel.Text = $"{(int)(e.NewValue * 100)}%";
+        ApplyChanges();
     }
 
     private void BgOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
         if (_isLoading || BgOpacityLabel == null) return;
         BgOpacityLabel.Text = $"{(int)(e.NewValue * 100)}%";
+        ApplyChanges();
     }
 
     private void LoadPresetButton_Click(object sender, RoutedEventArgs e)
@@ -153,20 +188,24 @@ public partial class SettingsForm : Window
         {
             FontComboBox.SelectedItem = preset.FontFamily;
             FontSizeSlider.Value = preset.FontSize;
+            FontSizeLabel.Text = ((int)preset.FontSize).ToString();
             TextColorTextBox.Text = preset.TextColor;
             UpdateColorPreview();
             TextOpacitySlider.Value = preset.TextOpacity;
+            TextOpacityLabel.Text = $"{(int)(preset.TextOpacity * 100)}%";
             BgOpacitySlider.Value = preset.BackgroundOpacity;
+            BgOpacityLabel.Text = $"{(int)(preset.BackgroundOpacity * 100)}%";
         }
         finally
         {
             _isLoading = false;
         }
+        SaveToSettings();
     }
 
     private void SavePresetButton_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new InputForm("Save Preset", "Enter preset name:");
+        var dialog = new InputForm("Save Preset", "Enter preset name:") { Owner = this };
         if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.InputText))
         {
             var name = dialog.InputText.Trim();
@@ -181,7 +220,8 @@ public partial class SettingsForm : Window
                 FontSize = FontSizeSlider.Value,
                 TextColor = TextColorTextBox.Text,
                 TextOpacity = TextOpacitySlider.Value,
-                BackgroundOpacity = BgOpacitySlider.Value
+                BackgroundOpacity = BgOpacitySlider.Value,
+                BackgroundColor = settings.BackgroundColor
             };
 
             settings.Presets.Add(preset);
@@ -196,7 +236,7 @@ public partial class SettingsForm : Window
         var presetName = PresetsComboBox.SelectedItem?.ToString();
         if (string.IsNullOrEmpty(presetName)) return;
 
-        var dialog = new ConfirmForm("Confirm Delete", $"Delete preset {presetName}?");
+        var dialog = new ConfirmForm("Confirm Delete", $"Delete preset {presetName}?") { Owner = this };
         if (dialog.ShowDialog() == true)
         {
             _settingsService.Settings.Presets.RemoveAll(p => p.Name == presetName);
@@ -205,16 +245,8 @@ public partial class SettingsForm : Window
         }
     }
 
-    private void OkButton_Click(object sender, RoutedEventArgs e)
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
-        SaveToSettings();
-        DialogResult = true;
-        Close();
-    }
-
-    private void CancelButton_Click(object sender, RoutedEventArgs e)
-    {
-        DialogResult = false;
         Close();
     }
 }

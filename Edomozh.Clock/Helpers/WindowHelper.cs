@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 
-namespace Edomozh.Clock.Native;
+namespace Edomozh.Clock.Helpers;
 
 public static class WindowHelper
 {
@@ -19,13 +19,33 @@ public static class WindowHelper
 
     #region P/Invoke
 
-    [DllImport("user32.dll")]
-    private static extern int GetWindowLong(IntPtr hwnd, int index);
+    [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr", SetLastError = true)]
+    private static extern IntPtr GetWindowLongPtr64(IntPtr hwnd, int index);
 
-    [DllImport("user32.dll")]
-    private static extern int SetWindowLong(IntPtr hwnd, int index, int newStyle);
+    [DllImport("user32.dll", EntryPoint = "GetWindowLong", SetLastError = true)]
+    private static extern IntPtr GetWindowLongPtr32(IntPtr hwnd, int index);
 
-    [DllImport("user32.dll")]
+    [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr", SetLastError = true)]
+    private static extern IntPtr SetWindowLongPtr64(IntPtr hwnd, int index, IntPtr newValue);
+
+    [DllImport("user32.dll", EntryPoint = "SetWindowLong", SetLastError = true)]
+    private static extern IntPtr SetWindowLongPtr32(IntPtr hwnd, int index, IntPtr newValue);
+
+    private static IntPtr GetWindowLongPtr(IntPtr hwnd, int index)
+    {
+        return IntPtr.Size == 8 
+            ? GetWindowLongPtr64(hwnd, index) 
+            : GetWindowLongPtr32(hwnd, index);
+    }
+
+    private static IntPtr SetWindowLongPtr(IntPtr hwnd, int index, IntPtr newValue)
+    {
+        return IntPtr.Size == 8 
+            ? SetWindowLongPtr64(hwnd, index, newValue) 
+            : SetWindowLongPtr32(hwnd, index, newValue);
+    }
+
+    [DllImport("user32.dll", SetLastError = true)]
     private static extern bool SetWindowPos(IntPtr hwnd, IntPtr hwndInsertAfter, int x, int y, int cx, int cy, uint flags);
 
     private static readonly IntPtr HWND_TOPMOST = new(-1);
@@ -42,7 +62,7 @@ public static class WindowHelper
         var hwnd = new WindowInteropHelper(window).Handle;
         if (hwnd == IntPtr.Zero) return;
 
-        int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+        var exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE).ToInt64();
 
         if (enable)
         {
@@ -53,7 +73,7 @@ public static class WindowHelper
             exStyle &= ~WS_EX_TRANSPARENT;
         }
 
-        SetWindowLong(hwnd, GWL_EXSTYLE, exStyle);
+        SetWindowLongPtr(hwnd, GWL_EXSTYLE, new IntPtr(exStyle));
     }
 
     public static void SetOverlayMode(Window window)
@@ -61,9 +81,9 @@ public static class WindowHelper
         var hwnd = new WindowInteropHelper(window).Handle;
         if (hwnd == IntPtr.Zero) return;
 
-        int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+        var exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE).ToInt64();
         exStyle |= WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE;
-        SetWindowLong(hwnd, GWL_EXSTYLE, exStyle);
+        SetWindowLongPtr(hwnd, GWL_EXSTYLE, new IntPtr(exStyle));
     }
 
     public static void SetTopmost(Window window, bool topmost)
@@ -76,26 +96,5 @@ public static class WindowHelper
             topmost ? HWND_TOPMOST : HWND_NOTOPMOST,
             0, 0, 0, 0,
             SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-    }
-
-    public static bool IsPositionOnScreen(double x, double y)
-    {
-        return x >= SystemParameters.VirtualScreenLeft &&
-               x < SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth &&
-               y >= SystemParameters.VirtualScreenTop &&
-               y < SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight;
-    }
-
-    public static (double X, double Y) ClampToScreen(double x, double y, double width, double height)
-    {
-        double left = SystemParameters.VirtualScreenLeft;
-        double top = SystemParameters.VirtualScreenTop;
-        double right = left + SystemParameters.VirtualScreenWidth;
-        double bottom = top + SystemParameters.VirtualScreenHeight;
-
-        x = Math.Max(left, Math.Min(x, right - width));
-        y = Math.Max(top, Math.Min(y, bottom - height));
-
-        return (x, y);
     }
 }

@@ -2,22 +2,13 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using Edomozh.Clock.Forms;
+using Edomozh.Clock.Infrastructure;
+using Edomozh.Clock.Resources;
 using Edomozh.Clock.Services;
 using Hardcodet.Wpf.TaskbarNotification;
 using Application = System.Windows.Application;
 
 namespace Edomozh.Clock;
-
-public class RelayCommand : ICommand
-{
-    private readonly Action _execute;
-    public RelayCommand(Action execute) => _execute = execute;
-#pragma warning disable CS0067 // Required by ICommand but unused
-    public event EventHandler? CanExecuteChanged;
-#pragma warning restore CS0067
-    public bool CanExecute(object? parameter) => true;
-    public void Execute(object? parameter) => _execute();
-}
 
 public partial class TrayIconForm : Application
 {
@@ -27,10 +18,10 @@ public partial class TrayIconForm : Application
     private const string MutexName = "edomozh.clock.SingleInstance";
 
     private Mutex? _mutex;
+    private bool _mutexOwned;
     private TaskbarIcon? _trayIcon;
     private MainForm? _mainWindow;
     private SettingsForm? _settingsWindow;
-    private Icon? _generatedIcon;
 
     private readonly SettingsService _settingsService = new();
     private readonly AutostartService _autostartService = new();
@@ -39,8 +30,8 @@ public partial class TrayIconForm : Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        _mutex = new Mutex(true, MutexName, out bool createdNew);
-        if (!createdNew)
+        _mutex = new Mutex(true, MutexName, out _mutexOwned);
+        if (!_mutexOwned)
         {
             new InfoForm("Already Running", "Edomozh Clock is already running.").ShowDialog();
             Shutdown();
@@ -57,27 +48,7 @@ public partial class TrayIconForm : Application
         _mainWindow.Show();
 
         _trayIcon = (TaskbarIcon)FindResource("TrayIcon");
-        _generatedIcon = CreateClockIcon();
-        _trayIcon.Icon = _generatedIcon;
-    }
-
-    private static Icon CreateClockIcon()
-    {
-        const int size = 32;
-        using var bitmap = new Bitmap(size, size);
-        using var g = Graphics.FromImage(bitmap);
-
-        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-        g.Clear(Color.Transparent);
-
-        using var pen = new Pen(Color.White, 2);
-        g.DrawEllipse(pen, 2, 2, size - 5, size - 5);
-
-        int cx = size / 2, cy = size / 2;
-        g.DrawLine(pen, cx, cy, cx - 6, cy - 8);  // Hour hand
-        g.DrawLine(pen, cx, cy, cx + 6, cy - 10); // Minute hand
-
-        return Icon.FromHandle(bitmap.GetHicon());
+        _trayIcon.Icon = AppResources.ClockIcon;
     }
 
     private void TrayIcon_PreviewTrayContextMenuOpen(object sender, RoutedEventArgs e)
@@ -113,6 +84,11 @@ public partial class TrayIconForm : Application
         OpenSettings();
     }
 
+    private void ResetPositionMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        _mainWindow?.ResetPosition();
+    }
+
     private void OpenSettings()
     {
         if (_settingsWindow != null && _settingsWindow.IsVisible)
@@ -137,13 +113,16 @@ public partial class TrayIconForm : Application
 
         _trayIcon?.Dispose();
         _trayIcon = null;
-        _generatedIcon?.Dispose();
-        _generatedIcon = null;
 
         _mainWindow?.Close();
 
-        _mutex?.ReleaseMutex();
+        if (_mutexOwned && _mutex != null)
+        {
+            _mutex.ReleaseMutex();
+            _mutexOwned = false;
+        }
         _mutex?.Dispose();
+        _mutex = null;
 
         Shutdown();
     }
@@ -151,7 +130,11 @@ public partial class TrayIconForm : Application
     protected override void OnExit(ExitEventArgs e)
     {
         _trayIcon?.Dispose();
-        _generatedIcon?.Dispose();
+        if (_mutexOwned && _mutex != null)
+        {
+            _mutex.ReleaseMutex();
+            _mutexOwned = false;
+        }
         _mutex?.Dispose();
         base.OnExit(e);
     }

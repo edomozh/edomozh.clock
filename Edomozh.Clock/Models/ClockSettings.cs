@@ -26,7 +26,10 @@ public class ClockSettings
     public string GetTimeFormat()
     {
         if (!string.IsNullOrWhiteSpace(CustomTimeFormat))
-            return CustomTimeFormat;
+        {
+            if (IsValidDateTimeFormat(CustomTimeFormat))
+                return CustomTimeFormat;
+        }
 
         var format = Use24HourFormat ? "HH:mm" : "h:mm tt";
         if (ShowSeconds)
@@ -38,7 +41,27 @@ public class ClockSettings
     public string? GetDateFormat()
     {
         if (!ShowDate) return null;
-        return CustomDateFormat ?? "dddd, MMMM d";
+        
+        if (!string.IsNullOrWhiteSpace(CustomDateFormat))
+        {
+            if (IsValidDateTimeFormat(CustomDateFormat))
+                return CustomDateFormat;
+        }
+        
+        return "dddd, MMMM d";
+    }
+
+    private static bool IsValidDateTimeFormat(string format)
+    {
+        try
+        {
+            _ = DateTime.Now.ToString(format);
+            return true;
+        }
+        catch (FormatException)
+        {
+            return false;
+        }
     }
 
     public void ApplyPreset(ThemePreset preset)

@@ -4,13 +4,13 @@
         Title="Edomozh Clock"
         AllowsTransparency="True"
         WindowStyle="None"
+        WindowStartupLocation="Manual"
         Background="Transparent"
         ShowInTaskbar="False"
         SizeToContent="WidthAndHeight"
         ResizeMode="NoResize"
         Loaded="Window_Loaded"
-        MouseLeftButtonDown="Window_MouseLeftButtonDown"
-        LocationChanged="Window_LocationChanged">
+        MouseLeftButtonDown="Window_MouseLeftButtonDown">
     
     <Border x:Name="ClockBorder"
             CornerRadius="8"

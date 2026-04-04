@@ -1,5 +1,5 @@
 using System.Windows;
-using Edomozh.Clock.Helpers;
+using Edomozh.Clock.Resources;
 
 namespace Edomozh.Clock.Forms;
 
@@ -13,7 +13,7 @@ public partial class InputForm : Window
 
         Title = title;
         PromptTextBlock.Text = prompt;
-        Icon = IconHelper.CreateClockIconSource();
+        Icon = AppResources.ClockIconImageSource;
 
         Loaded += (s, e) => InputTextBox.Focus();
     }

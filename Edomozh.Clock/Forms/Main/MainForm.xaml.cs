@@ -2,7 +2,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Edomozh.Clock.Native;
+using Edomozh.Clock.Helpers;
 using Edomozh.Clock.Services;
 using Color = System.Windows.Media.Color;
 using FontFamily = System.Windows.Media.FontFamily;
@@ -15,19 +15,18 @@ public partial class MainForm : Window
     private readonly DispatcherTimer _timer;
     private readonly SettingsService _settingsService;
     private bool _isEditMode;
-    private bool _isDragging;
 
     public MainForm(SettingsService settingsService)
     {
         InitializeComponent();
-        _settingsService = settingsService;
 
-        _timer = new DispatcherTimer
+        _timer = new DispatcherTimer()
         {
             Interval = TimeSpan.FromMilliseconds(100)
         };
         _timer.Tick += Timer_Tick;
 
+        _settingsService = settingsService;
         _settingsService.SettingsChanged += OnSettingsChanged;
     }
 
@@ -43,7 +42,38 @@ public partial class MainForm : Window
             ClockBorder.BorderBrush = value ? new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)) : null;
 
             Cursor = value ? System.Windows.Input.Cursors.SizeAll : System.Windows.Input.Cursors.Arrow;
+
+            if (!value)
+            {
+                SavePosition();
+            }
         }
+    }
+
+    public void SavePosition()
+    {
+        _settingsService.Update(s =>
+        {
+            s.PositionX = Left;
+            s.PositionY = Top;
+        });
+        ApplyPosition();
+    }
+
+    public void ResetPosition()
+    {
+        _settingsService.Update(s =>
+        {
+            s.PositionX = 20;
+            s.PositionY = 20;
+        });
+        ApplyPosition();
+    }
+
+    private void ApplyPosition()
+    {
+        Left = _settingsService.Settings.PositionX;
+        Top = _settingsService.Settings.PositionY;
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -51,8 +81,7 @@ public partial class MainForm : Window
         WindowHelper.SetOverlayMode(this);
 
         ApplySettings();
-
-        IsEditMode = false;
+        ApplyPosition();
 
         UpdateTime();
         _timer.Start();
@@ -61,6 +90,11 @@ public partial class MainForm : Window
     private void Timer_Tick(object? sender, EventArgs e)
     {
         UpdateTime();
+
+        if (_settingsService.Settings.AlwaysOnTop)
+        {
+            WindowHelper.SetTopmost(this, true);
+        }
     }
 
     private void UpdateTime()
@@ -86,10 +120,6 @@ public partial class MainForm : Window
     {
         var settings = _settingsService.Settings;
 
-        var (x, y) = WindowHelper.ClampToScreen(settings.PositionX, settings.PositionY, ActualWidth, ActualHeight);
-        Left = x;
-        Top = y;
-
         Topmost = settings.AlwaysOnTop;
         if (IsLoaded)
         {
@@ -99,7 +129,7 @@ public partial class MainForm : Window
         TimeText.FontFamily = new FontFamily(settings.FontFamily);
         TimeText.FontSize = settings.FontSize;
         DateText.FontFamily = new FontFamily(settings.FontFamily);
-        DateText.FontSize = settings.FontSize * 0.35; // Date text is smaller
+        DateText.FontSize = settings.FontSize * 0.35;
 
         try
         {
@@ -131,21 +161,7 @@ public partial class MainForm : Window
     {
         if (_isEditMode && e.LeftButton == MouseButtonState.Pressed)
         {
-            _isDragging = true;
             DragMove();
-            _isDragging = false;
-        }
-    }
-
-    private void Window_LocationChanged(object? sender, EventArgs e)
-    {
-        if (_isDragging || _isEditMode)
-        {
-            _settingsService.Update(s =>
-            {
-                s.PositionX = Left;
-                s.PositionY = Top;
-            });
         }
     }
 

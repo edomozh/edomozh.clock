@@ -14,7 +14,9 @@
                     <MenuItem x:Name="EditModeMenuItem"
                             Header="Draggable"
                             IsCheckable="True"
-                              Click="EditModeMenuItem_Click"/>
+                            Click="EditModeMenuItem_Click"/>
+                    <MenuItem Header="Reset Position"
+                            Click="ResetPositionMenuItem_Click"/>
                     <Separator/>
                     <MenuItem Header="Settings..."
                             Click="SettingsMenuItem_Click"/>

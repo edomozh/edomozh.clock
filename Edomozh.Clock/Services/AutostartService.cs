@@ -8,6 +8,8 @@ public class AutostartService
     private const string RegistryKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string AppName = "edomozh.clock";
 
+    public string? LastError { get; private set; }
+
     public bool IsEnabled
     {
         get
@@ -21,6 +23,7 @@ public class AutostartService
             catch (Exception ex)
             {
                 Debug.WriteLine($"Failed to check autostart: {ex.Message}");
+                LastError = ex.Message;
                 return false;
             }
         }
@@ -50,15 +53,17 @@ public class AutostartService
         return path;
     }
 
-    public void SetEnabled(bool enable)
+    public bool SetEnabled(bool enable)
     {
+        LastError = null;
         try
         {
             using var key = Registry.CurrentUser.OpenSubKey(RegistryKeyPath, true);
             if (key == null)
             {
-                Debug.WriteLine("Failed to open registry key for autostart");
-                return;
+                LastError = "Failed to open registry key for autostart";
+                Debug.WriteLine(LastError);
+                return false;
             }
 
             if (enable)
@@ -68,29 +73,36 @@ public class AutostartService
                 {
                     key.SetValue(AppName, $"\"{exePath}\"");
                     Debug.WriteLine($"Autostart enabled with path: {exePath}");
+                    return true;
                 }
                 else
                 {
-                    Debug.WriteLine("Failed to get executable path for autostart");
+                    LastError = "Failed to get executable path for autostart";
+                    Debug.WriteLine(LastError);
+                    return false;
                 }
             }
             else
             {
                 key.DeleteValue(AppName, throwOnMissingValue: false);
                 Debug.WriteLine("Autostart disabled");
+                return true;
             }
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Failed to set autostart: {ex.Message}");
+            LastError = $"Failed to set autostart: {ex.Message}";
+            Debug.WriteLine(LastError);
+            return false;
         }
     }
 
-    public void SyncWithSettings(bool startWithWindows)
+    public bool SyncWithSettings(bool startWithWindows)
     {
         if (IsEnabled != startWithWindows)
         {
-            SetEnabled(startWithWindows);
+            return SetEnabled(startWithWindows);
         }
+        return true;
     }
 }

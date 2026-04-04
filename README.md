@@ -66,7 +66,8 @@ Settings are stored in:
 1. Run the application - clock overlay appears
 2. Right-click system tray icon for menu:
    - **Draggable** - toggle to drag/reposition clock
-   - **Settings...** - open settings dialog
+   - **Reset Position** - move clock to top-left corner
+   - **Settings** - open settings dialog
    - **Exit** - close application
 3. Double-click tray icon to open settings
 

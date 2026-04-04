@@ -18,7 +18,7 @@
                     <MenuItem Header="Reset Position"
                             Click="ResetPositionMenuItem_Click"/>
                     <Separator/>
-                    <MenuItem Header="Settings..."
+                    <MenuItem Header="Settings"
                             Click="SettingsMenuItem_Click"/>
                     <Separator/>
                     <MenuItem Header="Exit"

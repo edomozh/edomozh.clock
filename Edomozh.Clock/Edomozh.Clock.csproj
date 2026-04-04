@@ -9,7 +9,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>edomozh.clock</AssemblyName>
     <RootNamespace>Edomozh.Clock</RootNamespace>
-    <Version>1.0.2</Version>
+    <Version>1.0.1</Version>
     <Authors>edomozh</Authors>
     <Description>Configurable transparent digital clock overlay for Windows</Description>
     <ApplicationIcon>Resources\clock.ico</ApplicationIcon>

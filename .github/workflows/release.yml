@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - 'edomozh.clock/**'
+    workflow_dispatch:
 
 jobs:
   check-version:
